@@ -1,6 +1,7 @@
 import os
 import json
 import anthropic
+from anthropic import AnthropicBedrock
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -34,14 +35,32 @@ def render_prompt(template_path: str, variables: dict) -> str:
         rendered = rendered.replace(f"{{{{{key}}}}}", str(value))
     return rendered
 
-def get_claude_response(system_prompt: str, user_prompt: str):
-    api_key = os.getenv("ANTHROPIC_API_KEY")
-    model_name = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
+def get_client_and_model():
+    anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+    if anthropic_key and not anthropic_key.startswith("sk-ant-your") and anthropic_key.strip():
+        model_name = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
+        return anthropic.Anthropic(api_key=anthropic_key), model_name
 
-    if not api_key or api_key.startswith("sk-ant-your") or api_key.strip() == "":
+    aws_access = os.getenv("AWS_ACCESS_KEY_ID")
+    aws_secret = os.getenv("AWS_SECRET_ACCESS_KEY")
+    if aws_access and aws_secret and aws_access.strip() and aws_secret.strip():
+        model_name = os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20241022-v2:0")
+        region = os.getenv("AWS_REGION", "us-east-1")
+        client = AnthropicBedrock(
+            aws_access_key=aws_access,
+            aws_secret_key=aws_secret,
+            aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
+            aws_region=region
+        )
+        return client, model_name
+
+    return None, None
+
+def get_claude_response(system_prompt: str, user_prompt: str):
+    client, model_name = get_client_and_model()
+    if not client:
         return None
 
-    client = anthropic.Anthropic(api_key=api_key)
     try:
         response = client.messages.create(
             model=model_name,
@@ -52,7 +71,7 @@ def get_claude_response(system_prompt: str, user_prompt: str):
         )
         return response.content[0].text
     except Exception as e:
-        print(f"⚠️ API execution error: {e}")
+        print(f"API execution error: {e}")
         return None
 
 def get_simulated_response(config: dict):
@@ -100,9 +119,7 @@ def get_simulated_response(config: dict):
         ], indent=2)
 
 def run_lab1():
-    print("================================================================")
     print(" LAB 1: Build a BSA Agent System Prompt with Variables          ")
-    print("================================================================\n")
 
     user_prompt = "Generate initial technical requirements for a leave management system."
 
@@ -111,7 +128,7 @@ def run_lab1():
     print("--- 1. Testing Config AIG (SAP S/4HANA - P2P) ---")
     response_aig = get_claude_response(prompt_aig, user_prompt)
     if not response_aig:
-        print("ℹ️ Using simulated response (no API key configured):")
+        print("Using simulated response (no API key configured):")
         response_aig = get_simulated_response(cfg_aig)
     print(response_aig)
     print("\n" + "-"*60 + "\n")
@@ -121,7 +138,7 @@ def run_lab1():
     print("--- 2. Testing Config ABC Bank (Dynamics CRM - Sales) ---")
     response_abc = get_claude_response(prompt_abc, user_prompt)
     if not response_abc:
-        print("ℹ️ Using simulated response (no API key configured):")
+        print("Using simulated response (no API key configured):")
         response_abc = get_simulated_response(cfg_abc)
     print(response_abc)
     print("\n" + "="*60 + "\n")

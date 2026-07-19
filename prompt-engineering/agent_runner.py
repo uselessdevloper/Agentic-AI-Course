@@ -1,13 +1,10 @@
 import os
 import anthropic
+from anthropic import AnthropicBedrock
 from dotenv import load_dotenv
 
 # 1. Load environment variables from .env
 load_dotenv()
-
-api_key = os.getenv("ANTHROPIC_API_KEY")
-# Default to active Claude model version if not specified
-model_name = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
 
 # 2. System prompt starter setup
 SYSTEM = """
@@ -15,6 +12,30 @@ You are a Senior BSA at {{client}}.
 Analyse {{system}} {{domain}} reqs.
 Return ONLY valid JSON. No preamble.
 """
+
+def get_client_and_model():
+    """
+    Resolves client and model for either direct Anthropic API or Amazon Bedrock.
+    """
+    anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+    if anthropic_key and not anthropic_key.startswith("sk-ant-your") and anthropic_key.strip():
+        model_name = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
+        return anthropic.Anthropic(api_key=anthropic_key), model_name
+
+    aws_access = os.getenv("AWS_ACCESS_KEY_ID")
+    aws_secret = os.getenv("AWS_SECRET_ACCESS_KEY")
+    if aws_access and aws_secret and aws_access.strip() and aws_secret.strip():
+        model_name = os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20241022-v2:0")
+        region = os.getenv("AWS_REGION", "us-east-1")
+        client = AnthropicBedrock(
+            aws_access_key=aws_access,
+            aws_secret_key=aws_secret,
+            aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
+            aws_region=region
+        )
+        return client, model_name
+
+    return None, None
 
 def run_quickstart():
     print("==========================================")
@@ -27,8 +48,10 @@ def run_quickstart():
               .replace("{{domain}}", "P2P")
     )
 
-    if not api_key or api_key.startswith("sk-ant-your") or api_key.strip() == "":
-        print("⚠️ ANTHROPIC_API_KEY not configured in .env.")
+    client, model_name = get_client_and_model()
+
+    if not client:
+        print("ANTHROPIC_API_KEY / AWS Bedrock credentials not configured in .env.")
         print("Displaying simulated response for Quick-Start demo:\n")
         simulated_response = '''[
   {"id": "FR-001", "title": "Leave Entitlement Tracking", "description": "Track annual, sick, and carry-forward balances.", "priority": "High"},
@@ -40,8 +63,6 @@ def run_quickstart():
         print(simulated_response)
         return simulated_response
 
-    client = anthropic.Anthropic(api_key=api_key)
-    
     try:
         response = client.messages.create(
             model=model_name,
@@ -57,7 +78,7 @@ def run_quickstart():
         print(output)
         return output
     except Exception as e:
-        print(f"❌ API Call failed: {e}")
+        print(f" API Call failed: {e}")
         return None
 
 if __name__ == "__main__":
