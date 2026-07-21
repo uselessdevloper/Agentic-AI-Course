@@ -1,6 +1,7 @@
 import os
 import json
 import anthropic
+from anthropic import AnthropicBedrock
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -17,14 +18,32 @@ STEP2_USER_TEMPLATE = """Requirements: {{step1_output}}"""
 STEP3_SYSTEM = """You are a QA Lead. Generate BDD test cases from the user stories below. Return ONLY a JSON array: [{id, story_id, scenario, given, when, then, expected_result}]. Cover happy and sad paths."""
 STEP3_USER_TEMPLATE = """User Stories: {{step2_output}}"""
 
-def call_llm(system_prompt: str, user_prompt: str) -> str:
-    api_key = os.getenv("ANTHROPIC_API_KEY")
-    model_name = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
+def get_client_and_model():
+    anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+    if anthropic_key and not anthropic_key.startswith("sk-ant-your") and anthropic_key.strip():
+        model_name = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
+        return anthropic.Anthropic(api_key=anthropic_key), model_name
 
-    if not api_key or api_key.startswith("sk-ant-your") or api_key.strip() == "":
+    aws_access = os.getenv("AWS_ACCESS_KEY_ID")
+    aws_secret = os.getenv("AWS_SECRET_ACCESS_KEY")
+    if aws_access and aws_secret and aws_access.strip() and aws_secret.strip():
+        model_name = os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20241022-v2:0")
+        region = os.getenv("AWS_REGION", "us-east-1")
+        client = AnthropicBedrock(
+            aws_access_key=aws_access,
+            aws_secret_key=aws_secret,
+            aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
+            aws_region=region
+        )
+        return client, model_name
+
+    return None, None
+
+def call_llm(system_prompt: str, user_prompt: str) -> str:
+    client, model_name = get_client_and_model()
+    if not client:
         return None
 
-    client = anthropic.Anthropic(api_key=api_key)
     try:
         response = client.messages.create(
             model=model_name,
@@ -111,7 +130,7 @@ def run_lab2():
     user_prompt_1 = STEP1_USER_TEMPLATE.replace("{{raw_feature}}", raw_feature)
     step1_output = call_llm(STEP1_SYSTEM, user_prompt_1)
     if not step1_output:
-        print("ℹ️ Using simulated Step 1 output:")
+        print("Using simulated Step 1 output:")
         step1_output = get_simulated_step1_output()
     print(step1_output)
     print()
@@ -122,7 +141,7 @@ def run_lab2():
     user_prompt_2 = STEP2_USER_TEMPLATE.replace("{{step1_output}}", step1_output)
     step2_output = call_llm(STEP2_SYSTEM, user_prompt_2)
     if not step2_output:
-        print("ℹ️ Using simulated Step 2 output:")
+        print("Using simulated Step 2 output:")
         step2_output = get_simulated_step2_output()
     print(step2_output)
     print()

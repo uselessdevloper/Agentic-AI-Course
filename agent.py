@@ -19,7 +19,7 @@ def main():
     elif args.lab == 2:
         run_lab2()
     elif args.all or len(sys.argv) == 1:
-        print(" Running All Prompt Engineering Labs & Quick-Start...\n")
+        print("🚀 Running All Prompt Engineering Labs & Quick-Start...\n")
         run_quickstart()
         print("\n\n")
         run_lab1()

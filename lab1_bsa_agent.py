@@ -1,6 +1,7 @@
 import os
 import json
 import anthropic
+from anthropic import AnthropicBedrock
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -34,14 +35,32 @@ def render_prompt(template_path: str, variables: dict) -> str:
         rendered = rendered.replace(f"{{{{{key}}}}}", str(value))
     return rendered
 
-def get_claude_response(system_prompt: str, user_prompt: str):
-    api_key = os.getenv("ANTHROPIC_API_KEY")
-    model_name = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
+def get_client_and_model():
+    anthropic_key = os.getenv("ANTHROPIC_API_KEY")
+    if anthropic_key and not anthropic_key.startswith("sk-ant-your") and anthropic_key.strip():
+        model_name = os.getenv("CLAUDE_MODEL", "claude-3-5-sonnet-20241022")
+        return anthropic.Anthropic(api_key=anthropic_key), model_name
 
-    if not api_key or api_key.startswith("sk-ant-your") or api_key.strip() == "":
+    aws_access = os.getenv("AWS_ACCESS_KEY_ID")
+    aws_secret = os.getenv("AWS_SECRET_ACCESS_KEY")
+    if aws_access and aws_secret and aws_access.strip() and aws_secret.strip():
+        model_name = os.getenv("BEDROCK_MODEL_ID", "anthropic.claude-3-5-sonnet-20241022-v2:0")
+        region = os.getenv("AWS_REGION", "us-east-1")
+        client = AnthropicBedrock(
+            aws_access_key=aws_access,
+            aws_secret_key=aws_secret,
+            aws_session_token=os.getenv("AWS_SESSION_TOKEN"),
+            aws_region=region
+        )
+        return client, model_name
+
+    return None, None
+
+def get_claude_response(system_prompt: str, user_prompt: str):
+    client, model_name = get_client_and_model()
+    if not client:
         return None
 
-    client = anthropic.Anthropic(api_key=api_key)
     try:
         response = client.messages.create(
             model=model_name,
