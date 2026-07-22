@@ -1,0 +1,76 @@
+Part 1: 5 Problem Scenarios Best Solved by a Chatbot
+
+
+Scenario 1: Enterprise Policy and HR Knowledge Retrieval
+
+Problem: Employees repeatedly open tickets asking about parental leave, PTO policies, and health coverage.
+
+Chatbot Solution: A conversational retrieval augmented generation chatbot indexed against employee handbooks converts natural language queries into semantic searches, delivering grounded answers with direct document citations.
+
+
+Scenario 2: Step by Step Hardware Diagnostic Decision Tree
+
+Problem: A telecom provider experiences high support costs due to subscribers calling in for basic router or setup issues.
+
+Chatbot Solution: A state machine chatbot guides the subscriber through visual interactive prompts such as checking LED status, stepping through fixed decision branches without requiring autonomous system intervention.
+
+
+Scenario 3: Multi Turn Customer Onboarding and Lead Intake
+
+Problem: Web visitors drop off during a lengthy 15 field SaaS sign up form, causing lost conversion opportunities.
+
+Chatbot Solution: A slot filling conversational chatbot gathers user data incrementally via interactive dialogue, validates input types like email, phone, and company size, and posts the structured payload to the CRM API.
+
+
+Scenario 4: Interactive E Commerce Product Filtering
+
+Problem: Shoppers on an online retail store struggle to find products through static faceted filters.
+
+Chatbot Solution: A guided conversational agent captures subjective preferences such as a lightweight summer jacket under 100 dollars, queries the product database, and surfaces filtered items directly in chat.
+
+
+Scenario 5: 24/7 Tier 1 IT Service Desk FAQ Handling
+
+Problem: IT helpdesks spend over 40 percent of their bandwidth answering simple questions regarding software access, password reset URLs, and operating hours.
+
+Chatbot Solution: A lightweight conversational agent handles high frequency routine inquiries instantly via pre defined rules and standard vector search.
+
+
+
+
+Part 2: 5 Problem Scenarios Best Solved by an AI Agent
+
+
+Scenario 1: Automated Incident Remediation and Infrastructure Recovery
+
+Problem: A critical cloud database service experiences unexpected latency spikes at night, triggering system alarms.
+
+Agentic Solution: An Autonomous Monitoring Agent intercepts the alarm, executes diagnostic shell scripts via SSH, parses log files, isolates a runaway process, safely restarts the daemon via API, verifies health telemetry, and posts a postmortem summary to Slack.
+
+
+Scenario 2: Multi Agent E Commerce Order Exception and Refund Pipeline
+
+Problem: An e commerce customer claims an item arrived damaged and demands a refund or replacement.
+
+Agentic Solution: A Multi Agent System handles the request end to end. A Vision Agent analyzes the uploaded damage photo to score claim validity. An ERP Agent queries inventory across nearby fulfillment centers. A Payment Agent initiates a partial refund or triggers a reshipment order via the Stripe and logistics APIs.
+
+
+Scenario 3: Autonomous Technical Debt and Automated Code Refactoring
+
+Problem: A software team needs to update thousands of legacy Python functions across a large monorepo to support a new API version.
+
+Agentic Solution: An Engineering Agent using model context protocol and browser tools reads the repository, identifies deprecated function signatures, writes refactored code, executes unit tests in a sandboxed command line environment, fixes any breaking builds, and opens a Pull Request on GitHub autonomously.
+
+
+Scenario 4: Dynamic Supply Chain Inventory and Reordering System
+
+Problem: Unexpected weather delays distort inventory forecasting, threatening stockouts across multiple fulfillment hubs.
+
+Agentic Solution: A Supply Chain Agent continuously pulls live sales telemetry, updates ERP inventory levels, cross references weather data APIs, negotiates purchase order contracts with backup vendor APIs, and reroutes shipment schedules dynamically without manual intervention.
+
+
+Scenario 5: Multi Source Market Research and Competitive Intelligence Gathering
+
+Problem: An investment analyst requires weekly comprehensive market updates summarizing over 100 SEC filings, earnings calls, and news outlets.
+
+Agentic Solution: A Research Agent Workflow orchestrates web scrapers and specialized tools, fetches raw data from financial APIs, aggregates earnings transcripts, synthesizes consensus changes, generates a structured text report, and converts it into a PDF emailed to stakeholders.
