@@ -1,0 +1,20 @@
+{
+  "skill_name": "hello-world",
+  "description": "My first safe OpenClaw skill for demonstration",
+  "version": "1.0.0",
+  "has_skill_md": true,
+  "code_files_count": 0,
+  "risk_score": 0,
+  "risk_status": "PASS",
+  "severity": "Safe",
+  "features": {
+    "prompt_injection": false,
+    "secret_access": false,
+    "dangerous_shell": false,
+    "dangerous_code": false,
+    "network_exfiltration": false,
+    "metadata_issues": false
+  },
+  "finding_count": 0,
+  "threat_summary": []
+}
