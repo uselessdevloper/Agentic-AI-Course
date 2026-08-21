@@ -1,0 +1,25 @@
+{
+  "skill_name": "unsafe-test-skill",
+  "description": "Unsafe test skill with prompt injection, credentials, and dangerous instructions",
+  "version": "1.0.0",
+  "has_skill_md": true,
+  "code_files_count": 0,
+  "risk_score": 100,
+  "risk_status": "BLOCK",
+  "severity": "Critical",
+  "features": {
+    "prompt_injection": true,
+    "secret_access": false,
+    "dangerous_shell": true,
+    "dangerous_code": true,
+    "network_exfiltration": true,
+    "metadata_issues": false
+  },
+  "finding_count": 4,
+  "threat_summary": [
+    "Prompt Injection: Instruction Override",
+    "Prompt Injection: System Secret Leak",
+    "Dangerous Shell: Recursive Root/Home Deletion",
+    "Data Exfiltration Target: Discord Webhook"
+  ]
+}
