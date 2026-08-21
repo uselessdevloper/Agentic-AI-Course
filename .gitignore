@@ -2,11 +2,17 @@
 .env
 *.env
 
-# Python cache
+# Python cache & env
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
+.venv/
+venv/
+env/
+*.egg-info/
+build/
+dist/
 
 # macOS
 .DS_Store
